@@ -28,12 +28,15 @@ app
 
 //ENDPOINTS FOR USERS
 app
+ .route("/users")
+ .post(userController.createNewUser);
+ 
+app
  .route("/users/:token")
  .get(userController.listAllUsers)
- .post(userController.createNewUser);
 
 app
- .route("/users/:userid")
+ .route("/users/:token/:userid")
  .get(userController.readUser)
  .put(userController.updateUser)
  .delete(userController.deleteUser);
@@ -45,10 +48,10 @@ app
  .post(requestController.createNewRequest);
 
 app
- .route("requests/_id/:requestid")
+ .route("requests/_id/:token/:requestid")
  .get(requestController.readRequest)
  .put(requestController.updateRequest)
- .delete(requestController.updateRequest)
+ .delete(requestController.deleteRequest)
 
 app
  .route("/requests/dept/:token/:requestid")

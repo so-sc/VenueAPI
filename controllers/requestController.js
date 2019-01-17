@@ -4,12 +4,14 @@ const user = require('../models/user');
 exports.listAllRequests = (req, res) => {
 	let findToken = new Promise((resolve, reject) => {
 		user.find({token: req.params.token}, (err, _req) => {
-			console.log(_req.length);
-			if(_req.length <= 0){
+			if(_req.length <= 0 || _req.length > 1){
 				res.status(500).send("Invalid Token or Token Expired");
 			}
 			else{
-				resolve();
+				if(_req[0].priority != 0)
+					resolve();
+				else
+					res.status(500).send("403 - Forbidden ");
 			}
 		});
 	});
@@ -24,16 +26,30 @@ exports.listAllRequests = (req, res) => {
 };
 
 exports.createNewRequest = (req, res) => {
-	let newRequest = new request(req.body);
-	newRequest.save((err, _req) => {
-		if(err){
-			res.status(500).send(err);
-		}
-		res.status(201).json(_req);
+	let findToken = new Promise((resolve, reject) => {
+		user.find({token: req.params.token}, (err, _req) => {
+			if(_req.length <= 0 || _req.length > 1 ){
+				res.status(500).send("Invalid Token or Token Expired");
+			}
+			else{
+				resolve();
+			}
+		});
+	});
+	
+	findToken.then( () => {
+		let newRequest = new request(req.body);
+		newRequest.save((err, _req) => {
+			if(err){
+				res.status(500).send(err);
+			}
+			res.status(201).json(_req);
+		});
 	});
 };
 
 exports.readRequest = (req, res) => {
+	
 	request.findById(req.params.requestid, (err, _req) => {
 		if(err){
 			res.status(500).send(err);
