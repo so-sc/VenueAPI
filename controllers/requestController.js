@@ -49,15 +49,28 @@ exports.createNewRequest = (req, res) => {
 };
 
 exports.readRequest = (req, res) => {
-	
-	request.findById(req.params.requestid, (err, _req) => {
-		if(err){
-			res.status(500).send(err);
-		}
-		res.status(200).json(_req);
+	let findToken = new Promise((resolve, reject) => {
+		user.find({token: req.params.token}, (err, _req) => {
+			if(_req.length <= 0 || _req.length >1 ){
+				res.status(500).send("Invalid Token or Token Expired");
+			}
+			else{
+				resolve();
+			}
+		});
+	});
+	findToken.then( () => {
+		request.findById(req.params.requestid, (err, _req) => {
+			if(err){
+				res.status(500).send(err);
+			}
+			res.status(200).json(_req);
+		});
 	});
 };
 
+
+//@todo
 exports.updateRequest = (req, res) => {
 	request.findOneAndUpdate(
 		{faculty_id: req.params.requestid },
@@ -72,20 +85,30 @@ exports.updateRequest = (req, res) => {
 	);
 };
 
+
 exports.deleteRequest = (req, res) => {
-	request.remove({_id: req.params.requestid },(err, _req) => {
-		if(err){
-			res.status(500).send(err);
-		}
-		res.status(200).json({message: "Request Deleted Successfully"});
+	let findToken = new Promise((resolve, reject) => {
+		user.find({token: req.params.token}, (err, _req) => {
+			if(_req.length <= 0 || _req.length > 1){
+				res.status(500).send("Invalid Token or Token Expired");
+			}
+		});
+	});
+	
+	findToken.then( () => {
+		request.remove({_id: req.params.requestid },(err, _req) => {
+			if(err){
+				res.status(500).send(err);
+			}
+			res.status(200).json({message: "Request Deleted Successfully"});
+		});
 	});
 };
 
 exports.findDepartmentRequests = (req, res) => {
 	let findToken = new Promise((resolve, reject) => {
 		user.find({token: req.params.token}, (err, _req) => {
-			console.log(_req.length);
-			if(_req.length <= 0){
+			if(_req.length <= 0 || _req.length > 1){
 				res.status(500).send("Invalid Token or Token Expired");
 			}
 			else{
@@ -95,7 +118,6 @@ exports.findDepartmentRequests = (req, res) => {
 	});
 	findToken.then(() => {
 		request.find({department: req.params.requestid}, (err, _req) =>{
-			console.log("second");
 			if(err){
 				res.status(500).send(err);
 			}
@@ -107,11 +129,27 @@ exports.findDepartmentRequests = (req, res) => {
 };
 
 exports.deleteDepartmentRequests = (req, res) => {
-	request.remove({department: req.params.requestid }, (err, _req) => {
-		if(err){
-			res.status(500).send(err);
-		}
-		res.status(200).json(_req);
+	let findToken = new Promise((resolve, reject) => {
+		user.find({token: req.params.token}, (err, _req) => {
+			if(_req.length <=0 || _req.length > 1){
+				res.status(500).send("Invalid Token or Token Expired");
+			}
+			else{
+				if(_res[0].priority != 0)
+					resolve();
+				else
+					res.status(500).send("403 - Forbidden");
+			}
+		});
+	});
+	
+	findToken.then( () => {
+		request.remove({department: req.params.requestid }, (err, _req) => {
+			if(err){
+				res.status(500).send(err);
+			}
+			res.status(200).json(_req);
+		});
 	});
 };
 
