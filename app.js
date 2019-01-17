@@ -16,19 +16,19 @@ app.use(bodyParser.json());
 //API ENDPOINTS
 //ENDPOINTS FOR VENUES
 app
- .route("/venues")
+ .route("/venues/:token")
  .get(venueController.listAllVenues)
  .post(venueController.createNewVenue);
 
 app
- .route("/venues/:venueid")
+ .route("/venues/:token/:venueid")
  .get(venueController.readVenue)
  .put(venueController.updateVenue)
  .delete(venueController.deleteVenue);
 
 //ENDPOINTS FOR USERS
 app
- .route("/users")
+ .route("/users/:token")
  .get(userController.listAllUsers)
  .post(userController.createNewUser);
 
@@ -40,7 +40,7 @@ app
 
 //ENDPOINTS FOR REQUESTS
 app
- .route("/requests")
+ .route("/requests/:token")
  .get(requestController.listAllRequests)
  .post(requestController.createNewRequest);
 
@@ -51,7 +51,7 @@ app
  .delete(requestController.updateRequest)
 
 app
- .route("/requests/:token/dept/:requestid")
+ .route("/requests/dept/:token/:requestid")
  .get(requestController.findDepartmentRequests)
  .put(requestController.updateRequest)
  .delete(requestController.deleteRequest)

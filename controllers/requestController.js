@@ -2,11 +2,24 @@ const request = require('../models/request');
 const user = require('../models/user');
 
 exports.listAllRequests = (req, res) => {
-	request.find({}, (err, _req) => {
-		if(err){
-			res.status(500).send(err);
-		}
-		res.status(200).json(_req);
+	let findToken = new Promise((resolve, reject) => {
+		user.find({token: req.params.token}, (err, _req) => {
+			console.log(_req.length);
+			if(_req.length <= 0){
+				res.status(500).send("Invalid Token or Token Expired");
+			}
+			else{
+				resolve();
+			}
+		});
+	});
+	findToken.then(() => {
+		request.find({}, (err, _req) => {
+			if(err){
+				res.status(500).send(err);
+			}
+			res.status(200).json(_req);
+		});
 	});
 };
 
@@ -57,7 +70,7 @@ exports.findDepartmentRequests = (req, res) => {
 		user.find({token: req.params.token}, (err, _req) => {
 			console.log(_req.length);
 			if(_req.length <= 0){
-				res.status(500).send(_req);
+				res.status(500).send("Invalid Token or Token Expired");
 			}
 			else{
 				resolve();
