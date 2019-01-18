@@ -40,6 +40,12 @@ app
  .get(userController.readUser)
  .put(userController.updateUser)
  .delete(userController.deleteUser);
+ 
+app
+ .route("/users/dept/:token/:deptid")
+ .get(userController.findDepartmentUsers)
+ .put(userController.updateDepartmentUsers)
+ .delete(userController.deleteAllDepartmentUsers)
 
 //ENDPOINTS FOR REQUESTS
 app
@@ -54,10 +60,10 @@ app
  .delete(requestController.deleteRequest)
 
 app
- .route("/requests/dept/:token/:requestid")
+ .route("/requests/dept/:token/:deptid")
  .get(requestController.findDepartmentRequests)
  .put(requestController.updateRequest)
- .delete(requestController.deleteRequest)
+ .delete(requestController.deleteAllDepartmentRequests)
 
 app
  .route("/requests/id/:requestid")
