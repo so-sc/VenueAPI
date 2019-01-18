@@ -17,3 +17,5 @@ mongoose.connect(db_URI, options).then(
 );
 
 require("../models/venue");
+require("../models/user");
+require("../models/request");

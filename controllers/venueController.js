@@ -1,6 +1,9 @@
+//Controller to Handle Venues
+
 const venue = require('../models/venue');
 const user = require('../models/user');
 
+//Function to Validate user Token
 function findToken(reqToken){
 	
 	return new Promise(
@@ -15,7 +18,8 @@ function findToken(reqToken){
 	);
 }
 
-function _findToken(reqToken, minPriority){
+//Function to Validate User Token and Priority
+function findTokenAndPriority(reqToken, minPriority){
 	return new Promise(
 	function(resolve, reject) {
 		user.find({token: reqToken}, (err, _req) => {
@@ -31,9 +35,9 @@ function _findToken(reqToken, minPriority){
 		
 	});
 }
-	
+
+//List all Venues
 exports.listAllVenues = (req, res) => {
-	
 	findToken(req.params.token).then( () => {
 		venue.find({}, (err, ven) => {
 			if(err){
@@ -47,8 +51,11 @@ exports.listAllVenues = (req, res) => {
 	});
 };
 
+//Create New Venue
 exports.createNewVenue = (req, res) => {
-	_findToken(req.params.token, 2).then(() => {
+	
+	//Venue can be only created with user with high priority
+	findTokenAndPriority(req.params.token, 2).then(() => {
 		let newVenue = new venue(req.body);
 		newVenue.save((err, ven) => {
 			if(err){
@@ -61,6 +68,7 @@ exports.createNewVenue = (req, res) => {
 	});
 };
 
+//Read Details of a Venue
 exports.readVenue = (req, res) => {
 	findToken(req.params.token).then(()=> {
 		venue.findById(req.params.venueid, (err, ven) => {
@@ -96,11 +104,18 @@ exports.updateVenue = (req, res) => {
 	);
 };
 
+//Delete a Venue
 exports.deleteVenue = (req, res) => {
-	venue.remove({_id: req.params.venueid },(err, ven) => {
-		if(err){
-			res.status(404).send(err);
-		}
-		res.status(200).json({message: "User Deleted Successfully"});
+	
+	//Venue can be only deleted by users with High Priority
+	findTokenAndPriority(req.params.token, 2).then(() => {
+		venue.remove({_id: req.params.venueid },(err, ven) => {
+			if(err){
+				res.status(404).send(err);
+			}
+			res.status(200).json({message: "Venue Deleted Successfully"});
+		});
+	}).catch(message => {
+		res.status(500).send(message);
 	});
 };

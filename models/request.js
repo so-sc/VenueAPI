@@ -1,3 +1,5 @@
+//Model of a Request
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 

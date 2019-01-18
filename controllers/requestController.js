@@ -1,37 +1,42 @@
+//Controller to Handle Requests
+
 const request = require('../models/request');
 const user = require('../models/user');
 
-
+//Function to validate Token of user
 function findToken(reqToken){
-	
-return new Promise(
-	function(resolve, reject) {
-		user.find({token: reqToken}, (err, _req) => {
-			if(_req.length == 1)
-				resolve()
-			else
-				reject("Invalid Token or Token Expired");
-		});
-	});
+	return new Promise(
+		function(resolve, reject) {
+			user.find({token: reqToken}, (err, _req) => {
+				if(_req.length == 1)
+					resolve()
+				else
+					reject("Invalid Token or Token Expired");
+			});
+		}
+	);
 }
 
+//Function to Validate Token and Priority of User
 function findTokenAndPriority(reqToken, minPriority){
 	return new Promise(
-	function(resolve, reject) {
-		user.find({token: reqToken}, (err, _req) => {
-			if(_req.length == 1){
-				if(_req[0].priority >= minPriority)
-					resolve();
+		function(resolve, reject) {
+			user.find({token: reqToken}, (err, _req) => {
+				if(_req.length == 1){
+					if(_req[0].priority >= minPriority)
+						resolve();
+					else
+						reject("403 - Forbidden");
+				}
 				else
-					reject("403 - Forbidden");
-			}
-			else
-				reject("Invalid Token or Token Expired");
-		});
+					reject("Invalid Token or Token Expired");
+			});
+		}
 		
-	});
+	);
 }
 
+//List All Requests by all users
 exports.listAllRequests = (req, res) => {
 	findTokenAndPriority(req.params.token, 2).then(() => {
 		request.find({}, (err, _req) => {
@@ -45,6 +50,7 @@ exports.listAllRequests = (req, res) => {
 	});
 };
 
+//Create New Requests
 exports.createNewRequest = (req, res) => {
 	findToken(req.params.token).then( () => {
 		let newRequest = new request(req.body);
@@ -59,6 +65,7 @@ exports.createNewRequest = (req, res) => {
 	});
 };
 
+//Read Requests of current user
 exports.readRequest = (req, res) => {
 	findToken(req.params.token).then( () => {
 		request.findById(req.params.requestid, (err, _req) => {
@@ -72,7 +79,7 @@ exports.readRequest = (req, res) => {
 	});
 };
 
-
+//Update Request of current user
 exports.updateRequest = (req, res) => {
 	request.findOneAndUpdate(
 		{faculty_id: req.params.requestid },
@@ -87,7 +94,7 @@ exports.updateRequest = (req, res) => {
 	);
 };
 
-
+//Delete Requests of current user
 exports.deleteRequest = (req, res) => {
 	findToken(req.params.token).then( () => {
 		request.remove({_id: req.params.requestid },(err, _req) => {
@@ -101,6 +108,7 @@ exports.deleteRequest = (req, res) => {
 	});
 };
 
+//List All Requests by a Department
 exports.findDepartmentRequests = (req, res) => {
 	findTokenAndPriority(req.params.token,1).then(() => {
 		request.find({department: req.params.deptid}, (err, _req) =>{
@@ -114,6 +122,7 @@ exports.findDepartmentRequests = (req, res) => {
 	});
 };
 
+//Delete All Requests of a Department
 exports.deleteAllDepartmentRequests = (req, res) => {
 	findTokenAndPriority(req.params.token,1).then( () => {
 		request.remove({department: req.params.deptid }, (err, _req) => {
@@ -125,6 +134,7 @@ exports.deleteAllDepartmentRequests = (req, res) => {
 	});
 };
 
+//Find a Request By ID
 exports.findIDRequests = (req, res) => {
 	request.find({faculty_id: req.params.requestid }, (err, _req) => {
 		if(err){
@@ -134,6 +144,7 @@ exports.findIDRequests = (req, res) => {
 	});
 };
 
+//Delete a Request By ID
 exports.deleteIDRequest = (req, res) => {
 	request.remove({faculty_id: req.params.requestid }, (err, _req) => {
 		if(err){
