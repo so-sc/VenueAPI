@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const db_URI = "mongodb+srv://akashdeepb:RiqumCQ98ZuH9ZXX@soscluster-utlqu.mongodb.net/test?retryWrites=true";
+const db_URI = "<ENTER_URI_HERE>";
 
 const options = {
 	reconnectTries: Number.MAX_VALUE,
