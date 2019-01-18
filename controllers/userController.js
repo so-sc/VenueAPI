@@ -94,7 +94,7 @@ exports.updateUser = (req, res) =>{
 
 //Delete Current User
 exports.deleteUser = (req, res) => {
-	findToken(req.params.token).then(() => {
+	findTokenAndPriority(req.params.token, 1).then(() => {
 		user.remove({_id: req.params.userid },(err, task) => {
 			if(err){
 				res.status(404).send(err);
@@ -119,6 +119,25 @@ exports.findDepartmentUsers = (req, res) => {
 		res.status(500).send(message);
 	});
 }
+
+//Update Department Users
+exports.updateDepartmentUsers = (req, res) =>{
+	findTokenAndPriority(req.params.token, 1).then(() => {
+		user.findOneAndUpdate(
+			{department: req.params.deptid },
+			req.body,
+			{new: true},
+			(err, usr) => {
+				if(err){
+					res.status(500).send(err);
+				}
+				res.status(200).json(usr);
+			}
+		);
+	}).catch(message => {
+		res.status(500).send(message);
+	});
+};
 
 //Delete all users of a Department
 exports.deleteAllDepartmentUsers = (req, res) => {
