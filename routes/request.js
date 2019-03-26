@@ -61,6 +61,43 @@ router.post('/dept', AuthController.verify_token, function(req, res, next) {
     }
 });
 
+router.delete('/dept/delete/:id', AuthController.verify_token, function(req, res) {
+    if(req.decoded.priority > 0){
+        user.findOne({faculty_id: req.decoded.faculty_id}, (err, _fac) => {
+            if(err)
+                res.status(500).json({
+                    message: "Something went wrong. Please contact Admin"
+                });
+            else{
+                if(req.params.id == 'all'){
+                    request.remove({department: _fac.department}, (err, _response) => {
+                        if(err)
+                            res.status(500).json({
+                                message: "Something Went Wrong. Please contact the Admin"
+                            });
+                        else
+                            res.status(200).json(_response);
+                    });
+                }
+                else{
+                    request.remove({id: req.params.id}, (err, _response) => {
+                        if(err)
+                            res.status(500).json({
+                                message: "Something Went Wrong. Please contact the Admin"
+                            });
+                        else
+                            res.status(200).json(_response);
+                    });
+                }
+            }
+        });
+    }
+    else
+        res.status(403).json({
+            message: "Forbidden"
+        });
+});
+
 /*------------ NO MINIMUM PRIORITY -----------------------*/
 router.post('/', AuthController.verify_token, function(req, res, next) {
     request.find({faculty_id: req.decoded.faculty_id}, (err, _req) => {
